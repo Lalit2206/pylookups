@@ -36,13 +36,48 @@ position in `return_array`. Both arrays must be the same length.
 | `search_mode` | `1` first-to-last · `-1` last-to-first |
 | `if_not_found` | returned instead of raising `NotFoundError` |
 
+**Basic lookup** — find an id, get the name:
+
 ```python
 ids = [1, 2, 3]
 names = ["alice", "bob", "carol"]
 
-xlookup(2, ids, names)                        # "bob"
+xlookup(2, ids, names)        # "bob"
+xlookup(3, ids, names)        # "carol"
+```
+
+**Reverse direction too** — find a name, get the id:
+
+```python
+xlookup("bob", names, ids)    # 2
+```
+
+**Missing value with a default** — no try/except needed:
+
+```python
 xlookup(99, ids, names, if_not_found="n/a")   # "n/a"
-xlookup(7, [1, 5, 10], names, match_mode=-1)  # "bob"  (next smaller: 5)
+xlookup(99, ids, names)                       # raises NotFoundError
+```
+
+**Approximate match** — great for ranges like tax brackets or grades:
+
+```python
+cutoffs = [0, 60, 75, 90]
+grades = ["F", "C", "B", "A"]
+
+xlookup(82, cutoffs, grades, match_mode=-1)   # "B"  (next smaller: 75)
+xlookup(60, cutoffs, grades, match_mode=-1)   # "C"  (exact hit)
+xlookup(82, cutoffs, grades, match_mode=1)    # "A"  (next larger: 90)
+```
+
+**Search from the end** — when duplicates exist and you want the last one:
+
+```python
+codes = ["x", "y", "x"]
+values = [10, 20, 30]
+
+xlookup("x", codes, values)                   # 10  (first "x")
+xlookup("x", codes, values, search_mode=-1)   # 30  (last "x")
 ```
 
 ---
@@ -56,9 +91,36 @@ vlookup(lookup_value, table, col_index, exact=True)
 Search the **first column** of `table` for `lookup_value`, return the value
 at `col_index` of the matching row.
 
+**Basic lookup** — find id 2, get values from its row:
+
 ```python
-vlookup(2, table, 2)   # "bob"
-vlookup(2, table, 3)   # 75
+vlookup(2, table, 2)   # "bob"   (column 2 = name)
+vlookup(2, table, 3)   # 75      (column 3 = score)
+vlookup(1, table, 1)   # 1       (column 1 = the id itself)
+```
+
+**Handling a missing value:**
+
+```python
+from pylookup.exceptions import NotFoundError
+
+try:
+    vlookup(99, table, 2)
+except NotFoundError:
+    print("id 99 does not exist")
+```
+
+**Approximate match** — commission slabs, price tiers, grade bands:
+
+```python
+slabs = [
+    [0, "0%"],
+    [10000, "5%"],
+    [50000, "10%"],
+]
+
+vlookup(30000, slabs, 2, exact=False)   # "5%"  (largest value <= 30000 is 10000)
+vlookup(50000, slabs, 2, exact=False)   # "10%" (exact hit)
 ```
 
 !!! note
@@ -76,13 +138,31 @@ hlookup(lookup_value, table, row_index, exact=True)
 Like `vlookup`, but horizontal: search the **first row**, return the value
 at `row_index` of the matching column.
 
+Use it when your data runs sideways — headers in the first **row**,
+records in **columns**:
+
 ```python
 h_table = [
     ["id", 1, 2, 3],
     ["name", "alice", "bob", "carol"],
+    ["score", 90, 75, 60],
 ]
 
-hlookup(2, h_table, 2)   # "bob"
+hlookup(2, h_table, 2)   # "bob"  (row 2 = name)
+hlookup(2, h_table, 3)   # 75     (row 3 = score)
+hlookup(3, h_table, 2)   # "carol"
+```
+
+Approximate match works the same way as `vlookup` — pass `exact=False`
+with the first row sorted ascending:
+
+```python
+month_table = [
+    [1, 4, 7, 10],
+    ["Q1", "Q2", "Q3", "Q4"],
+]
+
+hlookup(8, month_table, 2, exact=False)   # "Q3"  (month 8 falls in the 7 slab)
 ```
 
 ---
@@ -96,11 +176,28 @@ index(array, row_num, col_num=None)
 Value at a position. Flat list → pass only `row_num`. 2D table → pass
 `col_num` too, or omit it to get the whole row.
 
+**Flat list** — just a position:
+
 ```python
 index(["a", "b", "c"], 2)   # "b"
-index(table, 3, 2)          # "bob"
-index(table, 3)             # [2, "bob", 75]
+index(["a", "b", "c"], 9)   # raises InvalidIndexError
 ```
+
+**2D table** — row and column:
+
+```python
+index(table, 3, 2)   # "bob"  (row 3, column 2)
+index(table, 2, 3)   # 90     (row 2, column 3)
+```
+
+**Whole row** — omit `col_num`:
+
+```python
+index(table, 3)      # [2, "bob", 75]
+```
+
+`index` is rarely used alone — its real power is together with `match`,
+which is exactly what [`index_match`](#index_match) packages up for you.
 
 ---
 
@@ -118,10 +215,29 @@ The 1-based **position** of `lookup_value` in `lookup_array`.
 | `1` | largest value <= target — array must be sorted ascending |
 | `-1` | smallest value >= target — array must be sorted descending |
 
+**Exact match** (default) — works on unsorted data:
+
 ```python
 match("carol", ["alice", "bob", "carol"])   # 3
-match(6, [1, 3, 5, 9], match_type=1)        # 3  (5 is largest <= 6)
+match(75, [90, 75, 60])                     # 2
+match("dave", ["alice", "bob"])             # raises NotFoundError
 ```
+
+**Approximate on ascending data** — where does a value fall?
+
+```python
+match(6, [1, 3, 5, 9], match_type=1)    # 3  (5 is the largest value <= 6)
+match(0.5, [1, 3, 5, 9], match_type=1)  # raises NotFoundError (nothing <= 0.5)
+```
+
+**Approximate on descending data:**
+
+```python
+match(6, [9, 7, 5, 3], match_type=-1)   # 2  (7 is the smallest value >= 6)
+```
+
+The position `match` returns feeds straight into `index` — or use
+[`index_match`](#index_match) to do both in one call.
 
 ---
 
@@ -137,8 +253,24 @@ The classic Excel INDEX+MATCH combo in one call: find `lookup_value` in
 ```python
 names = ["alice", "bob", "carol"]
 scores = [90, 75, 60]
+cities = ["delhi", "mumbai", "pune"]
 
-index_match(scores, "bob", names)   # 75
+index_match(scores, "bob", names)    # 75      (bob's score)
+index_match(cities, "bob", names)    # "mumbai" (bob's city)
+index_match(names, 90, scores)       # "alice"  (who scored 90?)
+```
+
+Unlike `vlookup`, the lookup column doesn't have to be first — you can
+look up in *any* list and return from *any* other list, in any direction.
+That's why Excel power users prefer INDEX+MATCH, and it's the same here.
+
+Approximate matching works too, via `match_type`:
+
+```python
+cutoffs = [0, 60, 75, 90]
+grades = ["F", "C", "B", "A"]
+
+index_match(grades, 82, cutoffs, match_type=1)   # "B"
 ```
 
 ---

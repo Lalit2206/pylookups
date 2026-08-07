@@ -48,5 +48,8 @@ sort(table[1:], by=3, reverse=True)      # highest score first
 
 ## Where next?
 
+- [Coming from Excel](excel.md) — Excel formula ↔ Python code, side by side.
 - [Function Reference](functions.md) — every function with examples.
+- [Roadmap](roadmap.md) — what's coming in 0.1.2 and beyond.
+- [FAQ](faq.md) — common questions answered.
 - [Support](support.md) — found a bug or have a question?

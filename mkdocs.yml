@@ -27,7 +27,10 @@ theme:
 
 nav:
   - Home: index.md
+  - Coming from Excel: excel.md
   - Function Reference: functions.md
+  - Roadmap: roadmap.md
+  - FAQ: faq.md
   - Changelog: changelog.md
   - Support: support.md
 
