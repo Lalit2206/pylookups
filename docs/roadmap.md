@@ -5,52 +5,74 @@ pylookups releases follow a simple sequential series: **0.1.1 → 0.1.2 →
 
 Current version: **0.1.1** (see the [Changelog](changelog.md)).
 
-## 0.1.2 — next release: completing the lookup family
+## 0.1.2 — next release
 
-Three new functions, all cousins of the ones already here:
+### Conditional math: `sumif` / `countif` / `averageif`
 
-### `xmatch()`
-The modern version of `match` — same relationship as `xlookup` has to
-`vlookup`. Returns a position with flexible matching:
-
-```python
-xmatch(7, [1, 5, 10], match_mode=-1)   # 2  (next smaller: 5)
-xmatch(2, [1, 2, 2, 3], search_mode=-1)  # 3  (search from the end)
-```
-
-### `lookup()`
-Excel's classic LOOKUP: search one list, return from another. Always
-approximate-match on sorted data — the old-school workhorse:
+Excel's conditional workhorses — sum, count, or average only the values
+that match a condition:
 
 ```python
-lookup(6, [1, 3, 5, 9], ["a", "b", "c", "d"])   # "c"
+scores = [90, 75, 60, 85]
+
+sumif(scores, lambda x: x > 70)       # 250
+countif(scores, lambda x: x > 70)     # 3
+averageif(scores, lambda x: x > 70)   # 83.33...
 ```
 
-### `choose()`
-Pick a value by its 1-based position:
+With a separate criteria range, like Excel's 3-argument form:
 
 ```python
-choose(2, "red", "green", "blue")   # "green"
+regions = ["east", "west", "east"]
+sales = [100, 200, 300]
+
+sumif(regions, "east", sales)   # 400
 ```
 
-## 0.1.3 — table slicing
+### Multi-condition: `sumifs` / `countifs`
 
-- `chooserows(table, 1, 3)` / `choosecols(table, 1, 3)` — pick specific rows or columns
-- `take(table, 3)` / `drop(table, 3)` — first/last N rows, or skip them
-- `transpose(table)` — flip rows and columns
+Multiple criteria at once:
 
-## 0.1.4 — sorting upgrades
+```python
+sumifs(sales, regions, "east", products, "tea")
+countifs(regions, "east", products, "tea")
+```
 
-- `sortby(array, by_array)` — sort one list by the order of another (Excel SORTBY)
-- Multi-level sort: `sort(table, by=[2, 1])`
+### `sortby`
 
-## Future 0.1.x ideas (order not decided yet)
+Sort one list by the order of another (Excel SORTBY):
 
-- `sumif` / `countif` / `averageif` — the conditional math family
-- Column **names** instead of numbers: `vlookup(2, table, "score")`
-- Wildcard matching: `xlookup("al*", names, scores)`
-- CSV helper: look up directly from a `.csv` file
-- List-of-dicts support: `[{"id": 1, "name": "alice"}, ...]`
+```python
+sortby(names, scores, reverse=True)   # names, highest score first
+```
+
+### `transpose`
+
+Flip rows and columns:
+
+```python
+transpose([[1, 2, 3], [4, 5, 6]])   # [[1, 4], [2, 5], [3, 6]]
+```
+
+### `take` / `drop`
+
+First or last N rows of a table — negative N counts from the end, just
+like Excel:
+
+```python
+take(table, 3)    # first 3 rows
+take(table, -2)   # last 2 rows
+drop(table, 1)    # everything except the first row (skip the header!)
+```
+
+### `vstack` / `hstack`
+
+Stack tables on top of each other, or side by side:
+
+```python
+vstack(table_jan, table_feb)   # rows of both, combined
+hstack(ids_col, names_col)     # columns joined into one table
+```
 
 ## Have a suggestion?
 

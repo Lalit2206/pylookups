@@ -47,8 +47,9 @@ default `exact=True`.
 
 ## Can I look up by column name instead of number?
 
-Not yet — `vlookup(2, table, "score")` is on the
-[Roadmap](roadmap.md). For now, use the column number.
+Not yet — for now, use the column number. If you'd like to see
+`vlookup(2, table, "score")` support, request it on
+[GitHub issues](https://github.com/Lalit2206/pylookups/issues).
 
 ## A value isn't found — why the error instead of `#N/A`?
 
