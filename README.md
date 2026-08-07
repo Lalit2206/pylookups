@@ -3,6 +3,8 @@
 Excel-style lookup, filter, and sort functions for plain Python lists — no
 pandas or numpy required.
 
+**Docs:** https://lalit2206.github.io/pylookups/
+
 ```bash
 pip install pylookups
 ```

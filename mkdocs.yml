@@ -1,0 +1,36 @@
+site_name: pylookups
+site_description: Excel-style lookup, filter, and sort functions for Python
+site_url: https://lalit2206.github.io/pylookups/
+repo_url: https://github.com/Lalit2206/pylookups
+repo_name: Lalit2206/pylookups
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+
+nav:
+  - Home: index.md
+  - Function Reference: functions.md
+  - Support: support.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences

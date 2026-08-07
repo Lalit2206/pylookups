@@ -23,9 +23,11 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = ["pytest"]
+docs = ["mkdocs-material"]
 
 [project.urls]
 Homepage = "https://github.com/Lalit2206/pylookups"
+Documentation = "https://lalit2206.github.io/pylookups/"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pylookup"]
