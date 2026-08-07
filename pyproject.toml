@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pylookups"
+version = "0.1.0"
+description = "Excel-style lookup, filter, and sort functions for Python"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Lalit Pal", email = "happytaak8@gmail.com" },
+]
+keywords = ["excel", "lookup", "vlookup", "xlookup", "hlookup", "index", "match", "filter", "sort"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/pylookups"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pylookup"]
+
+[tool.pytest.ini_options]
+testpaths = ["src/tests"]
