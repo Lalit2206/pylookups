@@ -1,3 +1,5 @@
+import pytest
+
 from pylookup import sort
 
 TABLE = [
@@ -22,3 +24,8 @@ def test_sort_table_by_column():
 def test_sort_with_custom_key():
     words = ["banana", "fig", "kiwi"]
     assert sort(words, key=len) == ["fig", "kiwi", "banana"]
+
+
+def test_sort_flat_with_by_raises():
+    with pytest.raises(ValueError):
+        sort([3, 1, 2], by=2)

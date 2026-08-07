@@ -99,3 +99,22 @@ def test_xlookup_approximate_next_larger():
     ids = [1, 5, 10]
     names = ["alice", "bob", "carol"]
     assert xlookup(7, ids, names, match_mode=1) == "carol"
+
+
+def test_xlookup_length_mismatch_raises():
+    with pytest.raises(ValueError):
+        xlookup(1, [1, 2, 3], ["a", "b"])
+
+
+def test_index_flat_with_col_num_raises():
+    with pytest.raises(ValueError):
+        index([1, 2, 3], 2, 2)
+
+
+def test_hlookup_ragged_table_raises():
+    ragged = [
+        ["id", 1, 2, 3],
+        ["name", "alice"],
+    ]
+    with pytest.raises(InvalidIndexError):
+        hlookup(3, ragged, 2)

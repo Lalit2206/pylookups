@@ -16,7 +16,9 @@ def sort(
     """
     if key is not None:
         sort_key = key
-    elif is_table(array) and by is not None:
+    elif by is not None:
+        if not is_table(array):
+            raise ValueError("by was given but array is a flat list, not a 2D table")
         sort_key = lambda row: row[by - 1]
     else:
         sort_key = None

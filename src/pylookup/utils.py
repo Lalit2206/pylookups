@@ -19,4 +19,9 @@ def get_column(table: Sequence[Sequence[Any]], col_num: int) -> List[Any]:
     """Return column `col_num` (1-based) from a 2D table."""
     if col_num < 1:
         raise InvalidIndexError(f"col_num {col_num} is out of range")
-    return [row[col_num - 1] for row in table]
+    column = []
+    for row in table:
+        if col_num > len(row):
+            raise InvalidIndexError(f"col_num {col_num} is out of range")
+        column.append(row[col_num - 1])
+    return column

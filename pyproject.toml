@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pylookups"
-version = "0.1.0"
+version = "0.1.1"
 description = "Excel-style lookup, filter, and sort functions for Python"
 readme = "README.md"
 requires-python = ">=3.9"

@@ -59,6 +59,8 @@ def index(
             raise InvalidIndexError(f"col_num {col_num} is out of range")
         return row[col_num - 1]
 
+    if col_num is not None:
+        raise ValueError("col_num was given but array is a flat list, not a 2D table")
     if row_num < 1 or row_num > len(array):
         raise InvalidIndexError(f"row_num {row_num} is out of range")
     return array[row_num - 1]
@@ -83,7 +85,11 @@ def vlookup(
     exact: bool = True,
 ) -> Any:
     """Excel-style VLOOKUP. Searches the first column of `table` for
-    lookup_value and returns the value at col_index (1-based) of that row."""
+    lookup_value and returns the value at col_index (1-based) of that row.
+
+    With exact=False the first column must be sorted ascending; the largest
+    value <= lookup_value is matched (same as Excel).
+    """
     first_column = get_column(table, 1)
     match_type = 0 if exact else 1
     position = match(lookup_value, first_column, match_type)
@@ -100,7 +106,11 @@ def hlookup(
     exact: bool = True,
 ) -> Any:
     """Excel-style HLOOKUP. Searches the first row of `table` for
-    lookup_value and returns the value at row_index (1-based) of that column."""
+    lookup_value and returns the value at row_index (1-based) of that column.
+
+    With exact=False the first row must be sorted ascending; the largest
+    value <= lookup_value is matched (same as Excel).
+    """
     first_row = get_row(table, 1)
     match_type = 0 if exact else 1
     position = match(lookup_value, first_row, match_type)
@@ -134,6 +144,8 @@ def xlookup(
         raise ValueError("match_mode must be -1, 0, or 1")
     if search_mode not in (-1, 1):
         raise ValueError("search_mode must be -1 or 1")
+    if len(lookup_array) != len(return_array):
+        raise ValueError("lookup_array and return_array must be the same length")
 
     indices = range(len(lookup_array))
     if search_mode == -1:
