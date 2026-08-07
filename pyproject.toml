@@ -25,7 +25,7 @@ classifiers = [
 dev = ["pytest"]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/pylookups"
+Homepage = "https://github.com/Lalit2206/pylookups"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pylookup"]
