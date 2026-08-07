@@ -28,6 +28,7 @@ theme:
 nav:
   - Home: index.md
   - Function Reference: functions.md
+  - Changelog: changelog.md
   - Support: support.md
 
 markdown_extensions:
