@@ -27,6 +27,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Playground: playground.md
   - Coming from Excel: excel.md
   - Function Reference: functions.md
   - Roadmap: roadmap.md
