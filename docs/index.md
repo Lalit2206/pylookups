@@ -1,6 +1,6 @@
 # pylookups
 
-[![PyPI version](https://img.shields.io/pypi/v/pylookups)](https://pypi.org/project/pylookups/)
+[![PyPI](https://img.shields.io/badge/PyPI-{{ version }}-3775A9?logo=pypi&logoColor=white)](https://pypi.org/project/pylookups/)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
