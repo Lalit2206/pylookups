@@ -6,8 +6,8 @@
 
 **Excel-style lookup, filter, and sort functions for plain Python lists — no pandas or numpy required.**
 
-The version badge above always shows the current release on PyPI — see the
-[Changelog](changelog.md) for what's new in it.
+Current version: **[{{ version }}](changelog.md)** — click it to see what's
+new, or grab it on [PyPI](https://pypi.org/project/pylookups/).
 
 If you know Excel, you already know this library. `VLOOKUP`, `XLOOKUP`, `INDEX`, `MATCH`, `FILTER`, `UNIQUE`, `SORT` — all as simple Python functions that work on ordinary lists.
 

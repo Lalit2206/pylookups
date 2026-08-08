@@ -25,6 +25,9 @@ theme:
     - content.code.copy
     - search.suggest
 
+hooks:
+  - scripts/mkdocs_version.py
+
 nav:
   - Home: index.md
   - Playground: playground.md

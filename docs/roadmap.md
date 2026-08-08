@@ -3,9 +3,8 @@
 pylookups releases follow a simple sequential series: **0.1.1 → 0.1.2 →
 0.1.3 → ...** Each release is small and focused.
 
-The current release is always the one on
-[PyPI](https://pypi.org/project/pylookups/); the
-[Changelog](changelog.md) lists every version.
+Current version: **[{{ version }}](changelog.md)** (see the
+[Changelog](changelog.md) for every release).
 
 ## 0.1.2 — fixes
 
