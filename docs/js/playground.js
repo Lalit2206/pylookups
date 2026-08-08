@@ -51,6 +51,17 @@ class InvalidIndexError(PyLookupError):
 from .exceptions import InvalidIndexError
 
 
+class _Missing:
+    """Type of the MISSING sentinel."""
+
+    def __repr__(self) -> str:
+        return "MISSING"
+
+
+MISSING = _Missing()
+"""Sentinel for "argument not supplied", so None can be passed as a real value."""
+
+
 def is_table(array: Sequence[Any]) -> bool:
     """True if array is 2D (a sequence of rows) rather than a flat list."""
     return len(array) > 0 and isinstance(array[0], (list, tuple))
@@ -77,7 +88,7 @@ def get_column(table: Sequence[Sequence[Any]], col_num: int) -> List[Any]:
   "lookup.py": `from typing import Any, Optional, Sequence
 
 from .exceptions import InvalidIndexError, NotFoundError
-from .utils import get_column, get_row, is_table
+from .utils import MISSING, get_column, get_row, is_table
 
 
 def match(lookup_value: Any, lookup_array: Sequence[Any], match_type: int = 0) -> int:
@@ -200,7 +211,7 @@ def xlookup(
     lookup_value: Any,
     lookup_array: Sequence[Any],
     return_array: Sequence[Any],
-    if_not_found: Any = None,
+    if_not_found: Any = MISSING,
     match_mode: int = 0,
     search_mode: int = 1,
 ) -> Any:
@@ -215,6 +226,7 @@ def xlookup(
        -1  search last to first.
     if_not_found:
         value returned instead of raising NotFoundError when nothing matches.
+        Omit it to get the exception; any value is accepted, including None.
     """
     if match_mode not in (-1, 0, 1):
         raise ValueError("match_mode must be -1, 0, or 1")
@@ -241,23 +253,26 @@ def xlookup(
 
     if closest_i is not None:
         return return_array[closest_i]
-    if if_not_found is not None:
+    if if_not_found is not MISSING:
         return if_not_found
     raise NotFoundError(lookup_value)
 `,
   "filtering.py": `from typing import Any, Callable, Sequence, Union
 
+from .utils import MISSING
+
 
 def filter(
     array: Sequence[Any],
     condition: Union[Callable[[Any], bool], Sequence[bool]],
-    if_empty: Any = None,
+    if_empty: Any = MISSING,
 ) -> Any:
     """Excel-style FILTER. Keeps items where condition is truthy.
 
     condition can be a predicate function, or a sequence of booleans the
     same length as array (mirrors Excel's boolean include array).
     if_empty is returned instead of an empty list when nothing matches.
+    Omit it to get the empty list; any value is accepted, including None.
     """
     if callable(condition):
         result = [item for item in array if condition(item)]
@@ -266,7 +281,7 @@ def filter(
             raise ValueError("condition must be the same length as array")
         result = [item for item, keep in zip(array, condition) if keep]
 
-    if not result and if_empty is not None:
+    if not result and if_empty is not MISSING:
         return if_empty
     return result
 
@@ -296,7 +311,7 @@ def unique(array: Sequence[Any], keep: str = "first") -> list:
 `,
   "sorting.py": `from typing import Any, Callable, List, Optional, Sequence
 
-from .utils import is_table
+from .utils import get_column, is_table
 
 
 def sort(
@@ -309,12 +324,15 @@ def sort(
 
     A flat list is sorted by value. A 2D table (list of rows) is sorted
     by the column \`by\` (1-based). \`key\` overrides both for custom sorting.
+
+    Raises InvalidIndexError if \`by\` is out of range for any row.
     """
     if key is not None:
         sort_key = key
     elif by is not None:
         if not is_table(array):
             raise ValueError("by was given but array is a flat list, not a 2D table")
+        get_column(array, by)  # validates \`by\` against every row
         sort_key = lambda row: row[by - 1]
     else:
         sort_key = None

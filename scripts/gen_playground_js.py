@@ -1,7 +1,7 @@
 """Generate docs/js/playground.js with the pylookup source embedded."""
 import pathlib
 
-ROOT = pathlib.Path(r"c:\pylookup")
+ROOT = pathlib.Path(__file__).resolve().parent.parent
 PKG = ROOT / "src" / "pylookup"
 OUT = ROOT / "docs" / "js" / "playground.js"
 

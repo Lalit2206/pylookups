@@ -3,6 +3,17 @@ from typing import Any, List, Sequence
 from .exceptions import InvalidIndexError
 
 
+class _Missing:
+    """Type of the MISSING sentinel."""
+
+    def __repr__(self) -> str:
+        return "MISSING"
+
+
+MISSING = _Missing()
+"""Sentinel for "argument not supplied", so None can be passed as a real value."""
+
+
 def is_table(array: Sequence[Any]) -> bool:
     """True if array is 2D (a sequence of rows) rather than a flat list."""
     return len(array) > 0 and isinstance(array[0], (list, tuple))

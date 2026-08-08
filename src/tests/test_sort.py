@@ -1,6 +1,7 @@
 import pytest
 
 from pylookup import sort
+from pylookup.exceptions import InvalidIndexError
 
 TABLE = [
     [2, "bob"],
@@ -29,3 +30,14 @@ def test_sort_with_custom_key():
 def test_sort_flat_with_by_raises():
     with pytest.raises(ValueError):
         sort([3, 1, 2], by=2)
+
+
+def test_sort_by_out_of_range_raises():
+    with pytest.raises(InvalidIndexError):
+        sort(TABLE, by=5)
+
+
+def test_sort_ragged_table_raises():
+    ragged = [[2, "bob"], [3]]
+    with pytest.raises(InvalidIndexError):
+        sort(ragged, by=2)

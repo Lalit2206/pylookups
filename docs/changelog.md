@@ -2,7 +2,21 @@
 
 All notable changes to pylookups are documented here.
 
-## 0.1.1 — 2026-08-07 (current)
+## 0.1.2 — 2026-08-08 (current)
+
+**Fixes and corrections — no new functions.**
+
+- `xlookup(..., if_not_found=None)` now returns `None` instead of raising.
+  The default is an internal sentinel, so every value — `None`, `0`, `""` —
+  is returned as given, and only omitting the argument raises
+  `NotFoundError`.
+- `filter(..., if_empty=None)` likewise returns `None` on an empty result;
+  omitting `if_empty` still returns `[]`.
+- `sort()` now raises `InvalidIndexError` when `by` is out of range for any
+  row (ragged tables included), instead of a raw `IndexError` from the sort
+  key. This matches `vlookup`/`hlookup`/`index`.
+
+## 0.1.1 — 2026-08-07
 
 **Fixes and corrections — no new functions.**
 

@@ -59,15 +59,17 @@ return the value at `col_index` of the matching row.
 Search the first row of `table` for `lookup_value`, return the value at
 `row_index` of the matching column.
 
-### `xlookup(lookup_value, lookup_array, return_array, if_not_found=None, match_mode=0, search_mode=1)`
+### `xlookup(lookup_value, lookup_array, return_array, if_not_found=..., match_mode=0, search_mode=1)`
 Search `lookup_array` for `lookup_value`, return the corresponding item
 from `return_array`. `match_mode`: `0` exact, `-1` exact or next smaller,
 `1` exact or next larger. `search_mode`: `1` first-to-last, `-1` last-to-first.
-Returns `if_not_found` instead of raising when nothing matches.
+Pass `if_not_found` to get that value back instead of a `NotFoundError`;
+omit it entirely to get the exception. Any value works, including `None`.
 
-### `filter(array, condition, if_empty=None)`
+### `filter(array, condition, if_empty=...)`
 Keep items where `condition` is true. `condition` is a predicate function
-or a boolean list the same length as `array`.
+or a boolean list the same length as `array`. Pass `if_empty` to get that
+value back instead of `[]` when nothing matches.
 
 ### `unique(array, keep="first")`
 Distinct items, order preserved. `keep="last"` keeps the last occurrence

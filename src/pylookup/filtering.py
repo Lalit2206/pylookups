@@ -1,16 +1,19 @@
 from typing import Any, Callable, Sequence, Union
 
+from .utils import MISSING
+
 
 def filter(
     array: Sequence[Any],
     condition: Union[Callable[[Any], bool], Sequence[bool]],
-    if_empty: Any = None,
+    if_empty: Any = MISSING,
 ) -> Any:
     """Excel-style FILTER. Keeps items where condition is truthy.
 
     condition can be a predicate function, or a sequence of booleans the
     same length as array (mirrors Excel's boolean include array).
     if_empty is returned instead of an empty list when nothing matches.
+    Omit it to get the empty list; any value is accepted, including None.
     """
     if callable(condition):
         result = [item for item in array if condition(item)]
@@ -19,7 +22,7 @@ def filter(
             raise ValueError("condition must be the same length as array")
         result = [item for item, keep in zip(array, condition) if keep]
 
-    if not result and if_empty is not None:
+    if not result and if_empty is not MISSING:
         return if_empty
     return result
 

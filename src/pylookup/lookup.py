@@ -1,7 +1,7 @@
 from typing import Any, Optional, Sequence
 
 from .exceptions import InvalidIndexError, NotFoundError
-from .utils import get_column, get_row, is_table
+from .utils import MISSING, get_column, get_row, is_table
 
 
 def match(lookup_value: Any, lookup_array: Sequence[Any], match_type: int = 0) -> int:
@@ -124,7 +124,7 @@ def xlookup(
     lookup_value: Any,
     lookup_array: Sequence[Any],
     return_array: Sequence[Any],
-    if_not_found: Any = None,
+    if_not_found: Any = MISSING,
     match_mode: int = 0,
     search_mode: int = 1,
 ) -> Any:
@@ -139,6 +139,7 @@ def xlookup(
        -1  search last to first.
     if_not_found:
         value returned instead of raising NotFoundError when nothing matches.
+        Omit it to get the exception; any value is accepted, including None.
     """
     if match_mode not in (-1, 0, 1):
         raise ValueError("match_mode must be -1, 0, or 1")
@@ -165,6 +166,6 @@ def xlookup(
 
     if closest_i is not None:
         return return_array[closest_i]
-    if if_not_found is not None:
+    if if_not_found is not MISSING:
         return if_not_found
     raise NotFoundError(lookup_value)

@@ -89,6 +89,18 @@ def test_xlookup_raises_when_missing():
         xlookup(99, ids, names)
 
 
+def test_xlookup_if_not_found_none():
+    ids = [1, 2, 3]
+    names = ["alice", "bob", "carol"]
+    assert xlookup(99, ids, names, if_not_found=None) is None
+
+
+def test_xlookup_if_not_found_falsy():
+    ids = [1, 2, 3]
+    names = ["alice", "bob", "carol"]
+    assert xlookup(99, ids, names, if_not_found=0) == 0
+
+
 def test_xlookup_approximate_next_smaller():
     ids = [1, 5, 10]
     names = ["alice", "bob", "carol"]

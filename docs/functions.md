@@ -24,7 +24,7 @@ table = [
 
 ```python
 xlookup(lookup_value, lookup_array, return_array,
-        if_not_found=None, match_mode=0, search_mode=1)
+        if_not_found=..., match_mode=0, search_mode=1)
 ```
 
 Search `lookup_array` for `lookup_value` and return the item at the same
@@ -34,7 +34,7 @@ position in `return_array`. Both arrays must be the same length.
 |---|---|
 | `match_mode` | `0` exact · `-1` exact or next smaller · `1` exact or next larger |
 | `search_mode` | `1` first-to-last · `-1` last-to-first |
-| `if_not_found` | returned instead of raising `NotFoundError` |
+| `if_not_found` | returned instead of raising `NotFoundError`; omit it to get the exception |
 
 **Basic lookup** — find an id, get the name:
 
@@ -56,8 +56,12 @@ xlookup("bob", names, ids)    # 2
 
 ```python
 xlookup(99, ids, names, if_not_found="n/a")   # "n/a"
+xlookup(99, ids, names, if_not_found=None)    # None
 xlookup(99, ids, names)                       # raises NotFoundError
 ```
+
+Any value is accepted as `if_not_found` — `None`, `0`, and `""` all come
+back as-is. Only omitting the argument produces the exception.
 
 **Approximate match** — great for ranges like tax brackets or grades:
 
@@ -278,7 +282,7 @@ index_match(grades, 82, cutoffs, match_type=1)   # "B"
 ## filter
 
 ```python
-filter(array, condition, if_empty=None)
+filter(array, condition, if_empty=...)
 ```
 
 Keep items where `condition` is true. `condition` is either a function or
@@ -288,6 +292,7 @@ a boolean list the same length as `array` (like Excel's include array).
 filter([1, 2, 3, 4, 5], lambda x: x % 2 == 0)    # [2, 4]
 filter(["a", "b", "c"], [True, False, True])     # ["a", "c"]
 filter([1, 2], lambda x: x > 10, if_empty="-")   # "-"
+filter([1, 2], lambda x: x > 10)                 # []  (no if_empty given)
 ```
 
 !!! warning
@@ -328,3 +333,6 @@ sort([3, 1, 2])                      # [1, 2, 3]
 sort(table[1:], by=3, reverse=True)  # rows by score, highest first
 sort(["banana", "fig"], key=len)     # ["fig", "banana"]
 ```
+
+A `by` that is out of range for any row raises `InvalidIndexError`, the
+same error the other column-based functions raise.
