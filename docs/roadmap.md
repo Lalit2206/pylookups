@@ -6,6 +6,19 @@ pylookups releases follow a simple sequential series: **0.1.1 → 0.1.2 →
 Current version: **[{{ version }}](changelog.md)** (see the
 [Changelog](changelog.md) for every release).
 
+## 0.1.3 — joining tables, and reading files
+
+- `join()` — attach a second table's columns to every matching row, instead
+  of looking values up one at a time. See
+  [Function Reference](functions.md#join).
+- File readers for CSV, TSV, Excel `.xlsx` and JSON, all built on the Python
+  standard library — pylookups still installs nothing else. See
+  [Loading data](loading-data.md).
+- `vlookup()`, `hlookup()`, `sort()` and `join()` accept **column names**
+  wherever they accept column numbers.
+- `vlookup()`/`hlookup()` can return several columns at once, or the whole
+  matching row, and take `if_not_found` like `xlookup` does.
+
 ## 0.1.2 — fixes
 
 **Fixes and corrections — no new functions.**

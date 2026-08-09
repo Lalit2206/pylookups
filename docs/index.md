@@ -35,21 +35,38 @@ table = [
     [3, "carol", 60],
 ]
 
-vlookup(2, table, 2)                     # "bob"
+vlookup(2, table, "name")                # "bob"    — by column name
+vlookup(2, table, None)                  # [2, "bob", 75]  — the whole row
 xlookup(3, [1, 2, 3], ["a", "b", "c"])   # "c"
-sort(table[1:], by=3, reverse=True)      # highest score first
+sort(table, by="score", reverse=True)    # highest score first
+```
+
+## From file to answer
+
+Load a real file and join two tables — still with nothing installed but pylookups:
+
+```python
+from pylookup import read_table, join, vlookup
+
+orders = read_table("orders.csv")                      # or .xlsx, .json, .tsv
+customers = read_table("customers.xlsx", sheet="Q1")
+
+full = join(orders, customers, by="cust_id")
+vlookup(103, full, ["name", "city"])                   # ["carol", "jaipur"]
 ```
 
 ## Why pylookups?
 
-- **Zero dependencies** — pure Python, nothing else to install.
+- **Zero dependencies** — pure Python, nothing else to install. Even the Excel and CSV readers are standard library.
 - **Familiar names** — the exact functions you already use in Excel.
 - **Excel conventions** — positions are 1-based, just like spreadsheet rows and columns.
+- **Column names** — say `"score"` instead of counting to 3.
 - **Typed** — full type hints, so your editor autocompletes everything.
 
 ## Where next?
 
 - [Coming from Excel](excel.md) — Excel formula ↔ Python code, side by side.
+- [Loading data](loading-data.md) — read CSV, Excel and JSON files into a table.
 - [Function Reference](functions.md) — every function with examples.
 - [Roadmap](roadmap.md) — how releases are numbered, and the latest fixes.
 - [FAQ](faq.md) — common questions answered.

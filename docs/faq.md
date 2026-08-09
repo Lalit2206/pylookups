@@ -47,9 +47,16 @@ default `exact=True`.
 
 ## Can I look up by column name instead of number?
 
-Not yet — for now, use the column number. If you'd like to see
-`vlookup(2, table, "score")` support, request it on
-[GitHub issues](https://github.com/Lalit2206/pylookups/issues).
+Yes, since 0.1.3 — `vlookup`, `hlookup`, `sort` and `join` all take a column
+name wherever they take a column number:
+
+```python
+vlookup(2, table, "score")
+sort(table, by="score", reverse=True)
+```
+
+Using a name means the first row is treated as a header. Matching ignores
+case, so `"Score"` finds a `score` heading.
 
 ## A value isn't found — why the error instead of `#N/A`?
 

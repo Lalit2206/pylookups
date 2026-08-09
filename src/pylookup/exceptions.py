@@ -12,3 +12,11 @@ class NotFoundError(PyLookupError):
 
 class InvalidIndexError(PyLookupError):
     """Raised when a row/column position is out of range."""
+
+
+class UnsupportedFormatError(PyLookupError):
+    """Raised when a file's format cannot be read."""
+
+
+class SheetNotFoundError(PyLookupError):
+    """Raised when a workbook has no sheet by the requested name or number."""

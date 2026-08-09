@@ -32,6 +32,7 @@ nav:
   - Home: index.md
   - Playground: playground.md
   - Coming from Excel: excel.md
+  - Loading data: loading-data.md
   - Function Reference: functions.md
   - Roadmap: roadmap.md
   - FAQ: faq.md

@@ -123,6 +123,64 @@ def test_index_flat_with_col_num_raises():
         index([1, 2, 3], 2, 2)
 
 
+def test_vlookup_by_column_name():
+    assert vlookup(2, TABLE, "name") == "bob"
+
+
+def test_vlookup_column_name_is_case_insensitive():
+    assert vlookup(2, TABLE, "Name") == "bob"
+
+
+def test_vlookup_returns_whole_row():
+    assert vlookup(2, TABLE, None) == [2, "bob", 75]
+
+
+def test_vlookup_returns_several_columns():
+    assert vlookup(2, TABLE, ["name", "score"]) == ["bob", 75]
+
+
+def test_vlookup_mixes_names_and_numbers():
+    assert vlookup(2, TABLE, ["name", 3]) == ["bob", 75]
+
+
+def test_vlookup_column_number_still_works():
+    assert vlookup(2, TABLE, 2) == "bob"
+
+
+def test_vlookup_if_not_found():
+    assert vlookup(99, TABLE, "name", if_not_found="—") == "—"
+
+
+def test_vlookup_if_not_found_none():
+    assert vlookup(99, TABLE, "name", if_not_found=None) is None
+
+
+def test_vlookup_unknown_column_name_raises():
+    with pytest.raises(InvalidIndexError):
+        vlookup(2, TABLE, "salary")
+
+
+def test_vlookup_header_is_not_searched_when_using_names():
+    with pytest.raises(NotFoundError):
+        vlookup("id", TABLE, "name")
+
+
+def test_hlookup_by_row_label():
+    assert hlookup(2, H_TABLE, "name") == "bob"
+
+
+def test_hlookup_returns_whole_column():
+    assert hlookup(2, H_TABLE, None) == [2, "bob", 75]
+
+
+def test_hlookup_several_labels():
+    assert hlookup(2, H_TABLE, ["name", "score"]) == ["bob", 75]
+
+
+def test_hlookup_if_not_found():
+    assert hlookup(99, H_TABLE, "name", if_not_found="—") == "—"
+
+
 def test_hlookup_ragged_table_raises():
     ragged = [
         ["id", 1, 2, 3],

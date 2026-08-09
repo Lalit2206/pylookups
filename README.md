@@ -12,7 +12,7 @@ pip install pylookups
 The install name is `pylookups`, but the import name is `pylookup`:
 
 ```python
-from pylookup import vlookup, xlookup, match, index, index_match, filter, unique, sort
+from pylookup import vlookup, xlookup, match, index, index_match, filter, unique, sort, join, read_table
 ```
 
 > **Note:** `filter` shadows Python's built-in `filter` in any module that
@@ -51,13 +51,21 @@ the whole row.
 `index` + `match` combined: find `lookup_value` in `lookup_array`, return
 the item at that position in `return_array`.
 
-### `vlookup(lookup_value, table, col_index, exact=True)`
-Search the first column of `table` (list of rows) for `lookup_value`,
-return the value at `col_index` of the matching row.
+### `vlookup(lookup_value, table, col_index=None, exact=True, if_not_found=...)`
+Search the first column of `table` (list of rows) for `lookup_value`, then
+return something from the matching row. `col_index` can be a 1-based number,
+a column name (`"score"`), a list of either, or `None` for the whole row.
+Using a name treats the first row as a header.
 
-### `hlookup(lookup_value, table, row_index, exact=True)`
-Search the first row of `table` for `lookup_value`, return the value at
-`row_index` of the matching column.
+### `hlookup(lookup_value, table, row_index=None, exact=True, if_not_found=...)`
+The same thing sideways: search the first row of `table`, return from the
+matching column. `row_index` accepts a number, a row label, a list, or `None`.
+
+### `join(left, right, by, if_not_found=None)`
+Attach every column of `right` to the rows of `left` that share a key —
+"drag the VLOOKUP down the column", as one call. `by` is a shared column
+name, a `(left_key, right_key)` pair, or a 1-based number. Unmatched rows are
+kept and filled with `if_not_found`.
 
 ### `xlookup(lookup_value, lookup_array, return_array, if_not_found=..., match_mode=0, search_mode=1)`
 Search `lookup_array` for `lookup_value`, return the corresponding item
@@ -76,8 +84,25 @@ Distinct items, order preserved. `keep="last"` keeps the last occurrence
 instead of the first.
 
 ### `sort(array, by=None, key=None, reverse=False)`
-Sort a flat list, or a 2D table by column `by` (1-based). `key` overrides
-both with a custom function.
+Sort a flat list, or a 2D table by column `by` (a 1-based number or a column
+name). `key` overrides both with a custom function.
+
+## Loading data
+
+Read a file straight into a table — standard library only, no pandas, polars
+or openpyxl:
+
+```python
+from pylookup import read_table
+
+read_table("sales.csv")                  # CSV, TSV, delimiter detected
+read_table("sales.xlsx", sheet="Q1")     # .xlsx/.xlsm, dates become date objects
+read_table("sales.json")                 # records, rows or columns
+```
+
+`read_csv`, `read_excel`, `read_json` and `sheet_names` are available
+individually. The old binary `.xls` format is not supported — save it as
+`.xlsx` or `.csv` first.
 
 ## Example
 

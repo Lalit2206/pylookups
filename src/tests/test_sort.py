@@ -37,6 +37,22 @@ def test_sort_by_out_of_range_raises():
         sort(TABLE, by=5)
 
 
+def test_sort_by_column_name_keeps_header_on_top():
+    table = [["id", "name"], [2, "bob"], [1, "alice"]]
+    assert sort(table, by="id") == [["id", "name"], [1, "alice"], [2, "bob"]]
+
+
+def test_sort_by_column_name_reverse():
+    table = [["id", "name"], [1, "alice"], [2, "bob"]]
+    assert sort(table, by="name", reverse=True)[1] == [2, "bob"]
+
+
+def test_sort_unknown_column_name_raises():
+    table = [["id", "name"], [1, "alice"]]
+    with pytest.raises(InvalidIndexError):
+        sort(table, by="score")
+
+
 def test_sort_ragged_table_raises():
     ragged = [[2, "bob"], [3]]
     with pytest.raises(InvalidIndexError):

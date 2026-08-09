@@ -2,7 +2,30 @@
 
 All notable changes to pylookups are documented here.
 
-## 0.1.2 — 2026-08-08 (current)
+## 0.1.3 — 2026-08-09 (current)
+
+**Two tables instead of one, and data straight from files.**
+
+- New `join()` — attaches a second table's columns to every matching row, so
+  you get a whole joined table in one call instead of dragging a VLOOKUP down
+  a column. Unmatched rows are kept and filled, the first of any repeated key
+  wins, and the right table is indexed once so large joins stay fast.
+- New file readers, all standard library — **no pandas, no polars, no
+  openpyxl**:
+    - `read_csv()` — detects the delimiter, converts number-like fields,
+      keeps leading zeros on ids, strips Excel's UTF-8 BOM.
+    - `read_excel()` — reads `.xlsx`/`.xlsm` directly, by sheet name or tab
+      number, turning date cells into real `date`/`datetime` objects.
+    - `read_json()` — records, rows or columns.
+    - `read_table()` — picks the right reader from the file extension.
+    - `sheet_names()` — lists the tabs in a workbook.
+- `vlookup()` and `hlookup()` take **column names**, a list of columns, or
+  `None` for the whole row/column, and accept `if_not_found` like `xlookup`.
+- `sort()` takes a column name too, keeping the header row on top.
+- The old binary `.xls` format is rejected with a message telling you to save
+  as `.xlsx` or `.csv`, rather than a confusing parse error.
+
+## 0.1.2 — 2026-08-08
 
 **Fixes and corrections — no new functions.**
 

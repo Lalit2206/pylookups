@@ -5,7 +5,16 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PKG = ROOT / "src" / "pylookup"
 OUT = ROOT / "docs" / "js" / "playground.js"
 
-FILES = ["__init__.py", "exceptions.py", "utils.py", "lookup.py", "filtering.py", "sorting.py"]
+FILES = [
+    "__init__.py",
+    "exceptions.py",
+    "utils.py",
+    "lookup.py",
+    "filtering.py",
+    "sorting.py",
+    "joining.py",
+    "io.py",
+]
 
 
 def js_escape(text: str) -> str:

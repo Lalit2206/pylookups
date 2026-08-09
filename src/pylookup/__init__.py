@@ -16,6 +16,18 @@ from .sorting import (
     sort,
 )
 
+from .joining import (
+    join,
+)
+
+from .io import (
+    read_table,
+    read_csv,
+    read_json,
+    read_excel,
+    sheet_names,
+)
+
 __all__ = [
     "xlookup",
     "vlookup",
@@ -26,4 +38,10 @@ __all__ = [
     "filter",
     "unique",
     "sort",
+    "join",
+    "read_table",
+    "read_csv",
+    "read_json",
+    "read_excel",
+    "sheet_names",
 ]

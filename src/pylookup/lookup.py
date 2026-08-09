@@ -1,7 +1,9 @@
-from typing import Any, Optional, Sequence
+from typing import Any, List, Optional, Sequence, Union
 
 from .exceptions import InvalidIndexError, NotFoundError
-from .utils import MISSING, get_column, get_row, is_table
+from .utils import MISSING, get_column, get_row, is_table, resolve_column, uses_names
+
+ColumnRef = Union[int, str]
 
 
 def match(lookup_value: Any, lookup_array: Sequence[Any], match_type: int = 0) -> int:
@@ -81,43 +83,97 @@ def index_match(
 def vlookup(
     lookup_value: Any,
     table: Sequence[Sequence[Any]],
-    col_index: int,
+    col_index: Union[ColumnRef, Sequence[ColumnRef], None] = None,
     exact: bool = True,
+    if_not_found: Any = MISSING,
 ) -> Any:
     """Excel-style VLOOKUP. Searches the first column of `table` for
-    lookup_value and returns the value at col_index (1-based) of that row.
+    lookup_value and returns something from the matching row.
+
+    col_index decides what comes back:
+        3                 the value in column 3 (1-based, like Excel)
+        "score"           the value under the "score" heading
+        ["name", "city"]  those columns, as a list
+        None              the whole matching row
+
+    Column names are read from the table's first row, which is then treated
+    as a header and left out of the search.
 
     With exact=False the first column must be sorted ascending; the largest
     value <= lookup_value is matched (same as Excel).
+    if_not_found is returned instead of raising NotFoundError when there is
+    no match; omit it to get the exception.
     """
-    first_column = get_column(table, 1)
-    match_type = 0 if exact else 1
-    position = match(lookup_value, first_column, match_type)
-    row = get_row(table, position)
-    if col_index < 1 or col_index > len(row):
-        raise InvalidIndexError(f"col_index {col_index} is out of range")
-    return row[col_index - 1]
+    wants_list = isinstance(col_index, (list, tuple))
+    refs: Sequence[ColumnRef] = col_index if wants_list else [col_index]  # type: ignore[assignment]
+
+    header = list(table[0]) if len(table) else []
+    body = table[1:] if uses_names(*refs) else table
+
+    try:
+        position = match(lookup_value, get_column(body, 1), 0 if exact else 1)
+    except NotFoundError:
+        if if_not_found is not MISSING:
+            return if_not_found
+        raise
+
+    row = get_row(body, position)
+    if col_index is None:
+        return row
+
+    values = []
+    for ref in refs:
+        col_num = resolve_column(header, ref)
+        if col_num < 1 or col_num > len(row):
+            raise InvalidIndexError(f"col_index {ref!r} is out of range")
+        values.append(row[col_num - 1])
+    return values if wants_list else values[0]
 
 
 def hlookup(
     lookup_value: Any,
     table: Sequence[Sequence[Any]],
-    row_index: int,
+    row_index: Union[ColumnRef, Sequence[ColumnRef], None] = None,
     exact: bool = True,
+    if_not_found: Any = MISSING,
 ) -> Any:
     """Excel-style HLOOKUP. Searches the first row of `table` for
-    lookup_value and returns the value at row_index (1-based) of that column.
+    lookup_value and returns something from the matching column.
+
+    row_index mirrors vlookup's col_index: a 1-based number, a row label,
+    a list of either, or None for the whole matching column. Row labels are
+    read from the table's first column, which is then left out of the search.
 
     With exact=False the first row must be sorted ascending; the largest
     value <= lookup_value is matched (same as Excel).
+    if_not_found is returned instead of raising NotFoundError when there is
+    no match; omit it to get the exception.
     """
-    first_row = get_row(table, 1)
-    match_type = 0 if exact else 1
-    position = match(lookup_value, first_row, match_type)
-    column = get_column(table, position)
-    if row_index < 1 or row_index > len(column):
-        raise InvalidIndexError(f"row_index {row_index} is out of range")
-    return column[row_index - 1]
+    wants_list = isinstance(row_index, (list, tuple))
+    refs: Sequence[ColumnRef] = row_index if wants_list else [row_index]  # type: ignore[assignment]
+
+    by_name = uses_names(*refs)
+    labels = get_column(table, 1) if by_name else []
+    body = [list(row)[1:] for row in table] if by_name else table
+
+    try:
+        position = match(lookup_value, get_row(body, 1), 0 if exact else 1)
+    except NotFoundError:
+        if if_not_found is not MISSING:
+            return if_not_found
+        raise
+
+    column = get_column(body, position)
+    if row_index is None:
+        return column
+
+    values = []
+    for ref in refs:
+        row_num = resolve_column(labels, ref)
+        if row_num < 1 or row_num > len(column):
+            raise InvalidIndexError(f"row_index {ref!r} is out of range")
+        values.append(column[row_num - 1])
+    return values if wants_list else values[0]
 
 
 def xlookup(

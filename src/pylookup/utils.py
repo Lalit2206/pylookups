@@ -36,3 +36,31 @@ def get_column(table: Sequence[Sequence[Any]], col_num: int) -> List[Any]:
             raise InvalidIndexError(f"col_num {col_num} is out of range")
         column.append(row[col_num - 1])
     return column
+
+
+def resolve_column(header: Sequence[Any], ref: Any) -> int:
+    """Turn a column reference into a 1-based position.
+
+    `ref` is either a 1-based number already, or a column name to look up in
+    `header` (the table's first row). Names are matched exactly first, then
+    case-insensitively, so "Score" finds a "score" heading.
+    """
+    if isinstance(ref, bool) or not isinstance(ref, (int, str)):
+        raise TypeError("column must be a 1-based number or a column name")
+    if isinstance(ref, int):
+        return ref
+
+    for i, name in enumerate(header):
+        if name == ref:
+            return i + 1
+    for i, name in enumerate(header):
+        if isinstance(name, str) and name.strip().lower() == ref.strip().lower():
+            return i + 1
+
+    known = ", ".join(repr(h) for h in header)
+    raise InvalidIndexError(f"no column named {ref!r} — the header row has: {known}")
+
+
+def uses_names(*refs: Any) -> bool:
+    """True if any column reference is a name rather than a number."""
+    return any(isinstance(r, str) for r in refs)

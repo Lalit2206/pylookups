@@ -89,11 +89,11 @@ xlookup("x", codes, values, search_mode=-1)   # 30  (last "x")
 ## vlookup
 
 ```python
-vlookup(lookup_value, table, col_index, exact=True)
+vlookup(lookup_value, table, col_index=None, exact=True, if_not_found=...)
 ```
 
-Search the **first column** of `table` for `lookup_value`, return the value
-at `col_index` of the matching row.
+Search the **first column** of `table` for `lookup_value`, then return
+something from the matching row.
 
 **Basic lookup** — find id 2, get values from its row:
 
@@ -103,16 +103,41 @@ vlookup(2, table, 3)   # 75      (column 3 = score)
 vlookup(1, table, 1)   # 1       (column 1 = the id itself)
 ```
 
-**Handling a missing value:**
+**Use column names instead of counting columns:**
 
 ```python
+vlookup(2, table, "name")     # "bob"
+vlookup(2, table, "Score")    # 75    — matching ignores case
+```
+
+Naming a column means the first row is treated as a header: it supplies the
+names and is left out of the search.
+
+**Get several columns, or the whole row:**
+
+```python
+vlookup(2, table, ["name", "score"])   # ["bob", 75]
+vlookup(2, table, ["name", 3])         # ["bob", 75]  — mix names and numbers
+vlookup(2, table, None)                # [2, "bob", 75]  — the entire row
+```
+
+**Handling a missing value** — either catch it, or ask for a default:
+
+```python
+vlookup(99, table, "name", if_not_found="—")   # "—"
+
 from pylookup.exceptions import NotFoundError
 
 try:
-    vlookup(99, table, 2)
+    vlookup(99, table, 2)      # no if_not_found given
 except NotFoundError:
     print("id 99 does not exist")
 ```
+
+!!! tip "Looking up a whole table at once"
+    `vlookup` answers one question at a time. To attach a second table's
+    columns to *every* row — Excel's "drag the formula down" — use
+    [join](#join).
 
 **Approximate match** — commission slabs, price tiers, grade bands:
 
@@ -326,13 +351,63 @@ sort(array, by=None, key=None, reverse=False)
 ```
 
 Returns a new sorted list (the input is not modified). Flat lists sort by
-value; 2D tables sort by column `by` (1-based). `key` overrides both.
+value; 2D tables sort by column `by`, given as a 1-based number or a column
+name. `key` overrides both.
 
 ```python
-sort([3, 1, 2])                      # [1, 2, 3]
-sort(table[1:], by=3, reverse=True)  # rows by score, highest first
-sort(["banana", "fig"], key=len)     # ["fig", "banana"]
+sort([3, 1, 2])                        # [1, 2, 3]
+sort(table[1:], by=3, reverse=True)    # rows by score, highest first
+sort(table, by="score", reverse=True)  # same, header kept on top
+sort(["banana", "fig"], key=len)       # ["fig", "banana"]
 ```
+
+Naming a column means the first row is a header: it stays at the top and only
+the rows under it move.
 
 A `by` that is out of range for any row raises `InvalidIndexError`, the
 same error the other column-based functions raise.
+
+---
+
+## join
+
+```python
+join(left, right, by, if_not_found=None)
+```
+
+Attach every column of `right` to the rows of `left` that match on a key —
+"drag the VLOOKUP down the whole column", as one call. Both tables start with
+a header row.
+
+```python
+orders = [["order_id", "cust_id", "amount"],
+          [101, 2, 250],
+          [102, 1, 90],
+          [104, 9, 75]]
+
+customers = [["cust_id", "name", "city"],
+             [1, "alice", "delhi"],
+             [2, "bob", "pune"]]
+
+join(orders, customers, by="cust_id", if_not_found="—")
+```
+
+```python
+[["order_id", "cust_id", "amount", "name", "city"],
+ [101, 2, 250, "bob",   "pune"],
+ [102, 1, 90,  "alice", "delhi"],
+ [104, 9, 75,  "—",     "—"]]      # id 9 has no customer
+```
+
+| `by` | Meaning |
+|---|---|
+| `"cust_id"` | key column, named the same in both tables |
+| `("id", "cust_id")` | different names on each side |
+| `2` | a 1-based column number, used on **both** sides |
+
+- Rows keep the order of `left`, and every one of them survives — an
+  unmatched row is filled with `if_not_found` rather than dropped.
+- When `right` holds the same key twice, the first of those rows wins, which
+  is what dragging a VLOOKUP down does.
+- The right table is indexed once up front, so a join stays fast on big
+  inputs instead of rescanning for every row.
